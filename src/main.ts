@@ -2,11 +2,14 @@ import './style.css'
 import * as THREE from 'three'
 import Stats from 'three/addons/libs/stats.module.js'
 import { GUI } from 'dat.gui'
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js'
+
 
 const scene = new THREE.Scene()
 scene.add(new THREE.GridHelper())
 
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000)
+camera.position.z = 1.5
 //camera.position.set(0, 2, 3)
 //camera.lookAt(0, 0.5, 0)
 
@@ -19,6 +22,8 @@ window.addEventListener('resize', () => {
   camera.updateProjectionMatrix()
   renderer.setSize(window.innerWidth, window.innerHeight)
 })
+
+new OrbitControls(camera, renderer.domElement)
 
 const geometry = new THREE.BoxGeometry()
 const material = new THREE.MeshNormalMaterial({ wireframe: true })
@@ -50,10 +55,24 @@ cameraFolder.add(camera, 'far', 0.01, 10).onChange(() => {
 })
 cameraFolder.open()
 
+/**
+ * We dont need an animation loop when using 3js,
+ * but because we dont retrigger a render
+ * thats why we have an animation loop to rerender.
+ * 
+ * good idea to make the animation framerate independant (use delta)
+ */
+const clock = new THREE.Clock()
+let delta
+
 function animate() {
   requestAnimationFrame(animate)
 
-  //camera.lookAt(0, 0.5, 0)
+  delta = clock.getDelta()
+  cube.rotation.x += 1.05 * delta
+  cube.rotation.y += 1.05 * delta
+
+  // camera.lookAt(0, 0.5, 0)
 
   renderer.render(scene, camera)
 
